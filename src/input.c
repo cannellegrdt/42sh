@@ -5,13 +5,7 @@
 ** test
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <stdlib.h>
-#define MAX_LEN 100
+#include "mysh.h"
 
 void set_raw_mode(struct termios *orig_termios)
 {
@@ -30,18 +24,18 @@ static void reset_mode(struct termios *orig_termios)
     tcsetattr(STDIN_FILENO, TCSANOW, orig_termios);
 }
 
-static void display_prompt_and_buffer(const char *buffer, int pos)
+static void display_prompt_and_buffer(const char *buffer, size_t pos)
 {
     if (isatty(0)) {
         printf("\r$>%s", buffer);
-        for (int i = pos; i < strlen(buffer); i++) {
+        for (size_t i = pos; i < strlen(buffer); i++) {
             printf("\b");
         }
         fflush(stdout);
     }
 }
 
-static switch_cse(int ch, char *buffer, int *pos)
+static void switch_cse(int ch, char *buffer, size_t *pos)
 {
     switch (ch) {
         case 'D':
@@ -55,7 +49,7 @@ static switch_cse(int ch, char *buffer, int *pos)
     }
 }
 
-static void handle_special_key(int *pos, char *buffer)
+static void handle_special_key(size_t *pos, char *buffer)
 {
     int ch = getchar();
 
@@ -65,7 +59,7 @@ static void handle_special_key(int *pos, char *buffer)
     }
 }
 
-static void handle_backspace(char *buffer, int *pos)
+static void handle_backspace(char *buffer, size_t *pos)
 {
     if (*pos > 0) {
         memmove(&buffer[*pos - 1], &buffer[*pos], strlen(buffer) - *pos + 1);
@@ -73,21 +67,25 @@ static void handle_backspace(char *buffer, int *pos)
     }
 }
 
-void handle_printable_char(char *buffer, int *pos, int ch)
+void handle_printable_char(char *buffer, size_t *pos, int ch)
 {
     memmove(&buffer[*pos + 1], &buffer[*pos], strlen(buffer) - *pos + 1);
     buffer[*pos] = ch;
     (*pos)++;
 }
 
-void read_input(char *buffer)
+void read_input(char *buffer, int exit_status)
 {
-    int pos = 0;
+    size_t pos = 0;
     int ch;
 
     while (1) {
         display_prompt_and_buffer(buffer, pos);
         ch = getchar();
+        if (ch == 4 || ch == EOF) {
+            printf("exit\n");
+            exit(exit_status);
+        }
         if (ch == 27)
             handle_special_key(&pos, buffer);
         if (ch == '\n')
@@ -99,14 +97,13 @@ void read_input(char *buffer)
     }
 }
 
-
-char *input_handler(void)
+char *input_handler(int exit_status)
 {
     char *input = malloc(sizeof(char)* MAX_LEN);
     struct termios orig_termios;
 
     set_raw_mode(&orig_termios);
-    read_input(input);
+    read_input(input, exit_status);
     reset_mode(&orig_termios);
     if (isatty(0))
         printf("\n");

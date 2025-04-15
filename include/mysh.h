@@ -24,13 +24,17 @@
     #define HEREDOC "heredoc"
     #define CORE_DUMPED " (core dumped)\n"
     #define PROMPT "$> "
+    #define MAX_LEN 100
+
 
     #include <stdlib.h>
     #include <stdio.h>
     #include <unistd.h>
+    #include <ctype.h>
     #include <string.h>
     #include <sys/types.h>
     #include <sys/wait.h>
+    #include <termios.h>
     #include <errno.h>
     #include <sys/stat.h>
     #include <fcntl.h>
@@ -74,5 +78,8 @@ int execute_logical(ast_node_t *node, int op_is_and);
 ast_node_t *parse_logical_expression(char **tokens, int *pos, int max_pos);
 int handle_logical_operator(token_line_t *tl, token_state_t *state,
     int i);
+
+//input handler
+char *input_handler(int exit_status);
 
 #endif //MYSH_H
