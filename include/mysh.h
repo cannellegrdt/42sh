@@ -16,6 +16,7 @@
     #define NLSPATH_PT2 "at:/usr/share/locale/%cl/LC_MESSAGES/%N.cat"
     #define NLSPATH_PRINT_PT1 "/usr/share/locale/%L/LC_MESSAGES/%N.c"
     #define NLSPATH_PRINT_PT2 "at:/usr/share/locale/%l/LC_MESSAGES/%N.cat\n"
+    #define ALIAS "alias"
     #define CD "cd"
     #define EXIT "exit"
     #define SETENV "setenv"
@@ -24,6 +25,7 @@
     #define HEREDOC "heredoc"
     #define CORE_DUMPED " (core dumped)\n"
     #define PROMPT "$> "
+    #define CONFIG_FILE ".42shrc"
     #define MAX_LEN 100
 
 
@@ -79,7 +81,10 @@ ast_node_t *parse_logical_expression(char **tokens, int *pos, int max_pos);
 int handle_logical_operator(token_line_t *tl, token_state_t *state,
     int i);
 
-//input handler
+// config_files.c //
+void setup_config_files(void);
+
+// input.c //
 char *input_handler(int exit_status);
 
 #endif //MYSH_H

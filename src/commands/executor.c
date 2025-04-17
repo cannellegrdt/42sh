@@ -16,6 +16,8 @@
  */
 static int get_command(char *args[], int count)
 {
+    if (strcmp(args[0], ALIAS) == 0)
+        return my_alias(args, count);
     if (strcmp(args[0], CD) == 0)
         return my_cd(args, count);
     if (strcmp(args[0], SETENV) == 0)
@@ -37,8 +39,8 @@ static int get_command(char *args[], int count)
  */
 static int handle_builtin_commands(char *args[], int count)
 {
-    if (strcmp(args[0], CD) == 0 || strcmp(args[0], SETENV) == 0 ||
-    strcmp(args[0], UNSETENV) == 0)
+    if (strcmp(args[0], ALIAS) == 0 || strcmp(args[0], CD) == 0 ||
+        strcmp(args[0], SETENV) == 0 || strcmp(args[0], UNSETENV) == 0)
         return get_command(args, count);
     return 0;
 }
@@ -60,6 +62,24 @@ static int check_status(int status)
     if (WIFSIGNALED(status))
         return print_error(strsignal(signal), NULL, WCOREDUMP(status)) ?
         128 + status : 1;
+    return status;
+}
+
+/**
+ * @brief Executes a command by parsing and processing the command line.
+ *
+ * @param line : The command line to execute.
+ * @return : The status of the command execution.
+ */
+int main_execute_command(char *line)
+{
+    ast_node_t *root = parse_line(line);
+    int status;
+
+    if (!root)
+        return 1;
+    status = execute_ast(root);
+    free_ast(root);
     return status;
 }
 

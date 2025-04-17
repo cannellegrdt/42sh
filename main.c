@@ -45,7 +45,7 @@ static void display_prompt(void)
 
     getcwd(current_dir, PATH_MAX);
     if (isatty(STDIN_FILENO)) {
-        printf(COLOR_CYAN" -> %s", current_dir);
+        printf(COLOR_CYAN"-> %s", current_dir);
         if (git != NULL) {
             getline(&line, &n, git);
             strstr(line, "\n")[0] = '\0';
@@ -80,32 +80,46 @@ static int process_special_commands(char *line, int last_status)
 }
 
 /**
- * @brief Executes a command by parsing and processing the command line.
+ * @brief Handles EOF (Ctrl+D) condition by exiting the shell.
  *
- * @param line : The command line to execute.
- * @return : The status of the command execution.
+ * @param line : The line buffer to free (if allocated).
+ * @param last_status : The status of the last executed command.
  */
-static int main_execute_command(char *line)
+static void handle_eof(char *line, int last_status)
 {
-    ast_node_t *root = parse_line(line);
-    int status;
-
-    if (!root)
-        return 1;
-    status = execute_ast(root);
-    free_ast(root);
-    return status;
+    if (isatty(STDIN_FILENO))
+        write(1, "exit\n", 5);
+    if (line)
+        free(line);
+    exit(last_status);
 }
 
-int main(int argc, char **argv)
+/**
+ * @brief Reads a command line from standard input.
+ *
+ * @param line : Pointer to the line buffer.
+ * @param len : Pointer to the buffer size.
+ * @param read_size : Pointer to store the number of bytes read.
+ * @return : The line read, or NULL on EOF.
+ */
+static char *read_command_line(char **line, size_t *len, ssize_t *read_size)
+{
+    *read_size = getline(line, len, stdin);
+    if (*read_size == -1)
+        return NULL;
+    if (*read_size > 0 && (*line)[*read_size - 1] == '\n')
+        (*line)[*read_size - 1] = '\0';
+    return *line;
+}
+
+int main(void)
 {
     char *line = NULL;
     int last_status = 0;
 
-    (void)argc;
-    (void)argv;
     setup_environment();
     setup_signal_handlers();
+    setup_config_files();
     while (1) {
         line = input_handler(last_status);
         if (process_special_commands(line, last_status))
