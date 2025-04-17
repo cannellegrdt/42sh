@@ -74,6 +74,21 @@ void handle_printable_char(char *buffer, size_t *pos, int ch)
     (*pos)++;
 }
 
+/**
+ * @brief Handles EOF (Ctrl+D) condition by exiting the shell.
+ *
+ * @param line : The line buffer to free (if allocated).
+ * @param last_status : The status of the last executed command.
+ */
+static void handle_eof(char *line, int last_status)
+{
+    if (isatty(STDIN_FILENO))
+        write(1, "exit\n", 5);
+    if (line)
+        free(line);
+    exit(last_status);
+}
+
 void read_input(char *buffer, int exit_status)
 {
     size_t pos = 0;
@@ -82,10 +97,8 @@ void read_input(char *buffer, int exit_status)
     while (1) {
         display_prompt_and_buffer(buffer, pos);
         ch = getchar();
-        if (ch == 4 || ch == EOF) {
-            printf("exit\n");
-            exit(exit_status);
-        }
+        if (ch == 4 || ch == EOF)
+            handle_eof(buffer, exit_status);
         if (ch == 27)
             handle_special_key(&pos, buffer);
         if (ch == '\n')
