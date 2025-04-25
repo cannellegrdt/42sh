@@ -13,7 +13,6 @@
 int print_environment(void);
 
 // executor //
-int create_fork(char *args[], int count);
 int main_execute_command(char *line);
 
 // my_alias //
@@ -31,11 +30,21 @@ int my_exit(char *args[]);
 void add_nlspath(char **environ, char *args[]);
 char *my_getenv(const char *name);
 
+// my_history_bang //
+int my_history_bang(char *args[], int count);
+
+// my_history //
+int save_history(char *line);
+int my_history(char *args[], int count);
+
 // my_setenv //
 int my_setenv(char *args[], int count);
 
 // my_unsetenv //
 int check_unsetenv(char *args[]);
 int my_unsetenv(char *args[]);
+
+// my_which //
+int my_which(char *args[], int count);
 
 #endif //COMMANDS_H

@@ -1125,62 +1125,77 @@ echo 'cd /tmp'
 
 
 # History
-[1501]
-NAME="History - last command"
-SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
-CLEAN=""
-TESTS=
-echo 'echo "First command"'
-echo '!!'
-[1501-END]
-
-[1502]
-NAME="History - by number"
-SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
-CLEAN=""
-TESTS=
-echo 'echo "Command 1"'
-echo 'echo "Command 2"'
-echo 'echo "Command 3"'
-echo '!2'
-[1502-END]
 
 [1503]
-NAME="History - by prefix"
+NAME="History - Invalid number"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 CLEAN=""
 TESTS=
-echo 'echo "Test history"'
-echo 'ls -la'
-echo '!ec'
+echo 'history Hello'
+echo 'history 42sh'
 [1503-END]
 
-[1504]
-NAME="History - negative research"
-SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
-CLEAN=""
-TESTS=
-echo 'echo "First"'
-echo 'echo "Second"'
-echo 'echo "Third"'
-echo '!-2'
-[1504-END]
+# History Bangs
 
-[1505]
-NAME="History - undefined command"
+# This test will never pass because tcsh doesn't have !!
+# [1551]
+# NAME="History Bangs - last command"
+# SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+# CLEAN=""
+# TESTS=
+# echo 'echo "First command"'
+# echo '!!'
+# [1551-END]
+
+# All of these tests won't work because tcsh is dependant on the session 
+# and everytime we add an echo here it will relaunch a tcsh session
+# [1552]
+# NAME="History Bangs - by number"
+# SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+# CLEAN=""
+# TESTS=
+# echo 'echo "Command 1"'
+# echo 'echo "Command 2"'
+# echo 'echo "Command 3"'
+# echo '!2'
+# [1552-END]
+
+# [1553]
+# NAME="History Bangs - by prefix"
+# SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+# CLEAN=""
+# TESTS=
+# echo 'echo "Test history"'
+# echo 'ls -la'
+# echo '!ec'
+# [1553-END]
+
+# [1554]
+# NAME="History Bangs - negative research"
+# SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+# CLEAN=""
+# TESTS=
+# echo 'echo "First"'
+# echo 'echo "Second"'
+# echo 'echo "Third"'
+# echo '!-2'
+# [1554-END]
+
+[1555]
+NAME="History Bangs - undefined command"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 CLEAN=""
 TESTS=
 echo '!nonexistent'
-[1505-END]
+[1555-END]
 
-[1506]
-NAME="History - incorrect syntax"
+[1556]
+NAME="History Bangs - incorrect syntax"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 CLEAN=""
 TESTS=
 echo '!'
-[1506-END]
+[1556-END]
 
 
 # Alias advanced
@@ -1440,7 +1455,7 @@ NAME="Logical operators with exit codes"
 SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
 CLEAN=""
 TESTS=
-echo 'exit 0 && echo "Should not display this"'
+echo 'exit 42 && echo "Should not display this"'
 [2015-END]
 
 [2016]
@@ -1450,3 +1465,165 @@ CLEAN=""
 TESTS=
 echo 'ls -l;echo test1;echo test2'
 [2016-END]
+
+# Where
+[2100]
+NAME="Simple where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls'
+[2100-END]
+
+[2101]
+NAME="Multiple where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls cp'
+[2101-END]
+
+[2102]
+NAME="Empty where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where'
+[2102-END]
+
+[2103]
+NAME="Nonexistant where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where thisdoesntexist'
+[2103-END]
+
+[2104]
+NAME="Nonexistant in between multiple where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls thisdoesntexist cp'
+[2104-END]
+
+[2105]
+NAME="Builtin where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where cd'
+[2105-END]
+
+[2106]
+NAME="Multiple nonexistant where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where thisdoesntexist1 thisdoesntexist2 thisdoesntexist3'
+[2106-END]
+
+[2107]
+NAME="Multiple builtins where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where cd where setenv'
+[2107-END]
+
+[2108]
+NAME="Every previous case where"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls cd thisdoesntexist'
+[2108-END]
+
+[2109]
+NAME="Where with no path"
+SETUP="export TERM=xterm ; PATH=''"
+CLEAN=""
+TESTS=
+echo 'where ls'
+[2109-END]
+
+# Which
+[2150]
+NAME="Simple which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls'
+[2150-END]
+
+[2151]
+NAME="Multiple which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls cp'
+[2151-END]
+
+[2152]
+NAME="Empty which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which'
+[2152-END]
+
+[2153]
+NAME="Nonexistant which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which thisdoesntexist'
+[2153-END]
+
+[2154]
+NAME="Nonexistant in between multiple which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls thisdoesntexist cp'
+[2154-END]
+
+[2155]
+NAME="Builtin which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which cd'
+[2155-END]
+
+[2156]
+NAME="Multiple nonexistant which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which thisdoesntexist1 thisdoesntexist2 thisdoesntexist3'
+[2156-END]
+
+[2157]
+NAME="Multiple builtins which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which cd which setenv'
+[2157-END]
+
+[2158]
+NAME="Every previous case which"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls cd thisdoesntexist'
+[2158-END]
+
+[2159]
+NAME="Which with no path"
+SETUP="export TERM=xterm ; PATH=''"
+CLEAN=""
+TESTS=
+echo 'which ls'
+[2159-END]

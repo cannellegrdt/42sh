@@ -126,7 +126,7 @@ int handle_quotes_token(token_line_t *tl, token_state_t *state, int i)
 {
     int save = 0;
 
-    if (tl->line[i] == '"' || tl->line[i] == '\'') {
+    if (tl->line[i] == DBL_QUOTE || tl->line[i] == QUOTE) {
         if (!state->in_quotes) {
             state->in_quotes = 1;
             state->quote_char = tl->line[i];
@@ -174,7 +174,7 @@ static int handle_special_cases(token_line_t *tl, token_state_t *state, int i)
 {
     int ret;
 
-    if (tl->line[i] == '"' || tl->line[i] == '\'')
+    if (tl->line[i] == DBL_QUOTE || tl->line[i] == QUOTE)
         return handle_quotes_token(tl, state, i);
     if (!(state->in_quotes) && (tl->line[i] == ' ' || tl->line[i] == '\t')) {
         ret = handle_whitespace(tl, state, i);
@@ -197,8 +197,11 @@ static int process_token_char(token_line_t *tl, token_state_t *state, int i)
 {
     int special_result = handle_special_cases(tl, state, i);
 
-    if (special_result != 0)
+    if (special_result != 0) {
+        if (special_result == 2)
+            i++;
         return special_result;
+    }
     if (!(state->in_token)) {
         state->start = i;
         state->in_token = 1;

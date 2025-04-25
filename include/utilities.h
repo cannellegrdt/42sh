@@ -8,6 +8,7 @@
 #ifndef UTILITIES_H
     #define UTILITIES_H
     #include "mysh.h"
+    #include <stdbool.h>
 
     #define COLOR_CYAN "\033[1;36m"
     #define COLOR_BLUE "\033[1;34m"
@@ -25,6 +26,13 @@ char *concat_args(char *args[]);
 // count_args.c //
 int count_args(char **args);
 
+// count_lines_file.c //
+long count_lines_file(FILE *fp);
+
+// file_path.c //
+char *is_file_in_home(char *file);
+FILE *get_file_path(char *file, char *perms);
+
 // frees.c //
 void free_command(command_t *cmd);
 void free_args(char **args);
@@ -40,9 +48,15 @@ int is_valid_command_after_open_paren(char **tokens, int *pos,
     int max_pos);
 
 // prepend.c //
-char *prepend(char *line, char *pre);
+char *prepend(char *line, char *pre, char middle);
 
 // print_help.c //
 void print_help(void);
+
+// strisdigit.c //
+int strisdigit(char *str);
+
+// dup_array //
+char **my_dup_array(char **array);
 
 #endif //UTILITIES_H

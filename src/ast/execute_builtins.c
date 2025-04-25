@@ -7,6 +7,38 @@
 
 #include "mysh.h"
 
+const char *builtins[] = {
+    ALIAS,
+    BINDKEY,
+    CD,
+    EXIT,
+    HISTORY,
+    HISTORY_BANG,
+    SETENV,
+    UNSETENV,
+    ENV,
+    WHERE,
+    WHICH,
+    NULL
+};
+
+/**
+ * @brief Checks if a node represents a builtin command.
+ *
+ * @param node : The AST node to check.
+ * @return : 1 if the node is a builtin command, 0 otherwise.
+ */
+int is_builtin_command(char **args)
+{
+    if (!args || !args[0])
+        return 0;
+    for (int i = 0; builtins[i] != NULL; i++) {
+        if (strcmp(args[0], builtins[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
 /**
  * @brief Handles execution of MOST builtin commands (all except exit).
  *
@@ -18,14 +50,22 @@ static int handle_most_builtins(char **args, int arg_count)
 {
     if (strcmp(args[0], ALIAS) == 0)
         return my_alias(args, arg_count);
+    if (strcmp(args[0], BINDKEY) == 0)
+        return my_bindkey(args, arg_count);
     if (strcmp(args[0], CD) == 0)
         return my_cd(args, arg_count);
     if (strcmp(args[0], ENV) == 0)
         return print_environment();
+    if (strcmp(args[0], HISTORY) == 0
+        || strncmp(args[0], HISTORY_BANG, strlen(HISTORY_BANG)) == 0)
+        return my_history(args, arg_count);
     if (strcmp(args[0], SETENV) == 0)
         return my_setenv(args, arg_count);
     if (strcmp(args[0], UNSETENV) == 0)
         return my_unsetenv(args);
+    if (strcmp(args[0], WHERE) == 0
+        || strcmp(args[0], WHICH) == 0)
+        return my_which(args, arg_count);
     return -1;
 }
 

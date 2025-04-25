@@ -14,19 +14,18 @@ const char *error_messages[] = {
     ": Not a directory.\n",
     ": Exec format error. Binary file not executable.\n",
     ": Cannot create file.\n",
-    "cd: Too many arguments.\n",
-    "setenv: Too many arguments.\n",
-    "unsetenv: Too few arguments.\n",
+    ": Too many arguments.\n",
+    ": Too few arguments.\n",
     "unsetenv: Wrong number of arguments.\n",
     "unsetenv: incorrect argument.\n",
     "Ambiguous input redirect.\n",
     "Ambiguous output redirect.\n",
     "Missing name for redirect.\n",
-    "Missing name for redirection\n"
+    "Missing name for redirection\n",
     "Invalid null command.\n",
     "exit: Expression Syntax.\n",
-    "exit: Badly formed number.\n",
-    ": Failed to create heredoc.\n"
+    ": Badly formed number.\n",
+    ": Failed to create heredoc.\n",
     "Unknown node type\n",
     "setenv: Variable name must begin with a letter.\n",
     "setenv: Variable name must contain alphanumeric characters.\n",
@@ -35,9 +34,10 @@ const char *error_messages[] = {
     "Invalid operator '|'. Did you mean '||'?\n",
     "Invalid null command after '&&'.\n",
     "Invalid null command after '||'.\n",
-    "Missing closing parenthesis.\n",
-    "Missing opening parenthesis.\n",
-    "Too many ('s.\n"
+    "Too many ('s.\n",
+    "Too many )'s.\n",
+    ": Event not found.\n",
+    ": No match.\n"
 };
 
 /**
