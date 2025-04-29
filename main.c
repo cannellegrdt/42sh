@@ -71,7 +71,11 @@ static char *handle_line_continuation(char *line, char *quote_type)
         line = process_multiline(line, 1, &is_operator);
     if (has_unclosed_brackets(line, &bracket_type))
         line = process_multiline(line, 2, &bracket_type);
-    return line;
+    char *copy = strdup(line);
+    char *str = backtiscks(copy);
+    if (strcmp(str, "exit1") == 0)
+        return NULL;
+    return str;
 }
 
 int main(void)
@@ -89,6 +93,8 @@ int main(void)
         if (!line)
             handle_eof(line, last_status);
         line = handle_line_continuation(line, &quote_type);
+        if (line == NULL)
+            continue;
         save_history(line);
         if (process_special_commands(line, last_status))
             continue;

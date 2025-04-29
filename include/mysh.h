@@ -122,4 +122,6 @@ char *my_readline(char *prompt);
 // wildcard //
 int wildcard(ast_node_t *ast);
 
+// backticks //
+char *backtiscks(char *buffer);
 #endif //MYSH_H

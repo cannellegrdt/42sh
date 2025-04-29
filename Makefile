@@ -50,7 +50,9 @@ SRC	=	src/ast/command_parser.c	\
 		src/truth_table.c \
 		src/prompt.c	\
 		src/utilities/wildcards.c	\
-		src/setup.c
+		src/setup.c    \
+		src/backticks.c
+
 
 
 MAIN_SRC	= main.c
