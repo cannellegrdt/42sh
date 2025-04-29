@@ -2,18 +2,18 @@
 ** EPITECH PROJECT, 2025
 ** B-PSU-200-LYN-2-1-42sh-hugo.arnal
 ** File description:
-** backticks
+** Functions for parsing and replacing backticks in a command line.
 */
 
 #include "mysh.h"
 
-int return_backticks_str(char *line)
+static int get_backticks_length(char *line)
 {
     int start = 0;
     int len = 0;
 
-    for (int a = 0; a < strlen(line); a++) {
-        if (line[a] == '`') {
+    for (int i = 0; line[i] != '\0'; i++) {
+        if (line[i] == '`') {
             start++;
             continue;
         }
@@ -22,54 +22,46 @@ int return_backticks_str(char *line)
         if (start == 2)
             return len;
     }
-    if (start == 1)
-        return 0;
-    return len;
+    return (start == 1) ? 0 : len;
 }
 
-char *create_command_line(char *line, int len)
+static char *extract_command(char *line, int len, int j)
 {
     int start = 0;
-    int b = 0;
     char *command_line;
 
     if (len == 0)
-        return "yes";
+        return strdup("echo");
     command_line = malloc(sizeof(char) * (len + 1));
-    if (command_line == NULL)
-        return NULL;
-
     for (int i = 0; line[i] != '\0'; i++) {
         if (line[i] == '`') {
             start++;
             continue;
         }
-        if (start == 2) {
-            command_line[b] = '\0';
-            return command_line;
-        }
+        if (start == 2)
+            break;
         if (start == 1) {
-            command_line[b] = line[i];
-            b++;
+            command_line[j] = line[i];
+            j++;
         }
     }
-    command_line[b] = '\0';
+    command_line[j] = '\0';
     return command_line;
 }
 
-char *read_file_to_string(const char *filename)
+static char *read_file_content(const char *filename)
 {
     FILE *file = fopen(filename, "rb");
     char *buffer;
-    long filesize = 0;
+    long filesize;
 
-    if (!file)
+    if (file == NULL)
         return NULL;
     fseek(file, 0, SEEK_END);
     filesize = ftell(file);
     fseek(file, 0, SEEK_SET);
-    buffer = (char*)malloc(filesize + 1);
-    if (!buffer) {
+    buffer = malloc(filesize + 1);
+    if (buffer == NULL) {
         fclose(file);
         return NULL;
     }
@@ -79,39 +71,7 @@ char *read_file_to_string(const char *filename)
     return buffer;
 }
 
-int return_newsize(int line_len, int bet_len, char *line)
-{
-    int new_size = 0;
-
-    for (int i = 0; i < line_len; i++) {
-        if (line[i] == '`') {
-            i++;
-            while (i < line_len && line[i] != '`')
-                i++;
-            if (i < line_len)
-                new_size += bet_len;
-            continue;
-        }
-        if (line[i] == '\n') {
-            new_size++; 
-            continue;
-        }
-        new_size++;
-    }
-    return new_size;
-}
-
-void boucle(int bet_len, const char *between_backticks, char *replaced, int *j) {
-    for (int k = 0; k < bet_len; k++) {
-        if (between_backticks[k] == '\n') {
-            replaced[(*j)++] = ' ';
-        } else {
-            replaced[(*j)++] = between_backticks[k];
-        }
-    }
-}
-
-int lopp(int i, int line_len, char *line)
+static int count_between_backticks(int line_len, char *line, int i)
 {
     i++;
     while (i < line_len && line[i] != '`')
@@ -119,69 +79,135 @@ int lopp(int i, int line_len, char *line)
     return i;
 }
 
-
-char *replace_backticks_zone(const char *line, const char *between_backticks)
+static int adjust_new_size(int i, int line_len, int new_size, int cmd_len)
 {
-    int j = 0;
+    if (i < line_len)
+        new_size += cmd_len;
+    return new_size;
+}
+
+static int calculate_new_size(int line_len, int cmd_len, const char *line)
+{
+    int new_size = 0;
+
+    for (int i = 0; i < line_len; i++) {
+        if (line[i] == '`') {
+            i = count_between_backticks(line_len, (char *)line, i);
+            new_size = adjust_new_size(i, line_len, new_size, cmd_len);
+            continue;
+        }
+        new_size++;
+    }
+    return new_size;
+}
+
+static void copy_command(const char *cmd, char *replaced, int *j)
+{
+    for (int k = 0; cmd[k] != '\0'; k++) {
+        if (cmd[k] == '\n') {
+            replaced[*j] = ' ';
+            (*j)++;
+            continue;
+        }
+        replaced[*j] = cmd[k];
+        (*j)++;
+    }
+}
+
+void cond1(int *i, int line_len)
+{
+    if (*i < line_len) {
+        *(i)++;
+    } 
+}
+
+static char *replace_backticks(const char *line, const char *cmd)
+{
     int line_len = strlen(line);
-    int bet_len = strlen(between_backticks);
-    int new_size = return_newsize(line_len, bet_len, line);
+    int cmd_len = strlen(cmd);
+    int new_size = calculate_new_size(line_len, cmd_len, line);
     char *replaced = malloc(new_size + 1);
     int i = 0;
+    int j = 0;
 
-    if (!replaced)
-        return NULL;
-    while (i < line_len && j < new_size) {
+    while (i < line_len) {
         if (line[i] == '`') {
-            i = lopp(i, line_len, line);
+            i = count_between_backticks(line_len, (char *)line, i);
             if (i < line_len) {
                 i++;
-                boucle(bet_len, between_backticks, replaced, &j);
-                j--;
+                copy_command(cmd, replaced, &j);
             }
             continue;
         }
         if (line[i] == '\n') {
-            replaced[j++] = ' ';
+            replaced[j] = ' ';
+            j++;
             i++;
             continue;
         }
-        replaced[j++] = line[i];
+        replaced[j] = line[i];
+        j++;
         i++;
     }
     replaced[j] = '\0';
     return replaced;
 }
 
-int backticks_numbers(char *line)
+static int count_backticks(const char *line)
 {
-    int returned = 0;
+    int count = 0;
+
     for (int i = 0; line[i] != '\0'; i++) {
         if (line[i] == '`')
-            returned++;
+            count++;
     }
-    return returned;
+    return count;
+}
+
+static char *check_unmatched_backticks(char *buffer, char *cmd)
+{
+    if (strcmp(cmd, "echo") == 0 && (count_backticks(buffer) != 2 && count_backticks(buffer) != 0)) {
+        printf("Unmatched '`'.\n");
+        free(cmd);
+        return strdup("exit1");
+    }
+    return NULL;
+}
+
+static char *create_redirect_command(char *cmd)
+{
+    char *cmd_with_redirect;
+    int size_cmd = strlen(cmd);
+    int size_redirect = strlen(" > ali.txt");
+
+    cmd_with_redirect = malloc(size_cmd + size_redirect + 1);
+    if (cmd_with_redirect == NULL)
+        return NULL;
+    strcpy(cmd_with_redirect, cmd);
+    strcat(cmd_with_redirect, " > ali.txt");
+    return cmd_with_redirect;
 }
 
 char *backtiscks(char *buffer)
 {
-    char *replaced;
-    int a = return_backticks_str(buffer);
-    char *str = create_command_line(buffer, a);
+    int len;
+    char *cmd;
+    char *cmd_with_redirect;
+    char *file_content;
+    char *result;
 
-    if (buffer == NULL) return NULL;
-    if (str == NULL)
-        return buffer;
-    if (strcmp(str, "yes") == 0 && (backticks_numbers(buffer) != 2 &&
-    backticks_numbers(buffer) != 0)) {
-        printf("Unmatched '`'.\n");
-        return "exit1";
-    }
-    if (strcmp(str, "yes") == 0)
-        str = strdup("echo ");
-    char *str1 = strdup(str);
-    char *s2 = strdup(" > ali.txt");
-    strcat(str, s2);
-    main_execute_command(str);
-    return replace_backticks_zone(buffer, read_file_to_string("ali.txt"));
+    len = get_backticks_length(buffer);
+    cmd = extract_command(buffer, len, 0);
+    if (cmd == NULL)
+        return strdup(buffer);
+    result = check_unmatched_backticks(buffer, cmd);
+    if (result != NULL)
+        return result;
+    cmd_with_redirect = create_redirect_command(cmd);
+    if (cmd_with_redirect == NULL)
+        return NULL;
+    main_execute_command(cmd_with_redirect);
+    file_content = read_file_content("ali.txt");
+    result = replace_backticks(buffer, file_content);
+    return result;
 }
