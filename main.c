@@ -93,6 +93,7 @@ int main(void)
         if (process_special_commands(line, last_status))
             continue;
         last_status = main_execute_command(line);
+        free(line);
     }
     return 0;
 }

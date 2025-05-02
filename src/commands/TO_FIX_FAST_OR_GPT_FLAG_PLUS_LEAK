@@ -1,0 +1,13 @@
+ENV:
+
+check if environ is remalloc, and if not do it
+FREE env at the end of the programm
+
+Remove the useless struct that's way bloated
+
+my_unsetenv:
+
+in core:
+can concatenate the return of error with a ternaire
+
+

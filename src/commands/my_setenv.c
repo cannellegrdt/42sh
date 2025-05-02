@@ -17,10 +17,12 @@ static int is_valid_identifier(const char *str)
 {
     if (!str || !(*str))
         return 0;
+    // test without this part (may be useless)
     if (!((*str >= 'A' && *str <= 'Z') || (*str >= 'a' && *str <= 'z') ||
     *str == '_'))
         return print_error(get_error_msg(ERR_SETENV_BEGIN_LETTER), NULL,
         0);
+    //
     for (int i = 1; str[i]; i++) {
         if (!(str[i] == '_' || (str[i] >= 'A' && str[i] <= 'Z') ||
         (str[i] >= 'a' && str[i] <= 'z') ||

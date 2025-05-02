@@ -53,7 +53,7 @@ get_previous_state() {
 update_history() {
     test_id=$1
     new_state=$2
-    
+
     $GREP -v "^$test_id:" "$HISTORY_FILE" > "$HISTORY_FILE.tmp"
     echo "$test_id:$new_state" >> "$HISTORY_FILE.tmp"
     $MV "$HISTORY_FILE.tmp" "$HISTORY_FILE"
@@ -72,7 +72,6 @@ run_script()
   . /tmp/.tmp.$$
   $RM -f /tmp/.tmp.$$
 }
-
 prepare_test()
 {
   local testfn="/tmp/.tester.$$"
@@ -126,19 +125,19 @@ load_test()
   TOTAL_TESTS=$((TOTAL_TESTS+1))
 
   previous_state=`$GREP "^$id:" "$HISTORY_FILE" | cut -d':' -f2`
-  
+
   if [ $ok -eq 1 ]
   then
     PASSED_TESTS=$((PASSED_TESTS+1))
     current_state="OK"
-    
+
     if [ "$previous_state" = "KO" ]; then
       IMPROVED_TESTS=$((IMPROVED_TESTS+1))
       status_color=$BLUE
     else
       status_color=$GREEN
     fi
-    
+
     if [ $debug -ge 1 ]
     then
       echo -e "Test $id ($NAME) : ${status_color}OK${RESET}"
@@ -146,7 +145,7 @@ load_test()
       then
         echo "Output $MYSHELL :"
         $CAT -e /tmp/.shell.$$
-        echo "" 
+        echo ""
         echo "Output $REFER :"
         $CAT -e /tmp/.refer.$$
         echo ""
@@ -157,17 +156,17 @@ load_test()
   else
     FAILED_TESTS=$((FAILED_TESTS+1))
     current_state="KO"
-    
+
     if [ "$previous_state" = "OK" ]; then
       REGRESSED_TESTS=$((REGRESSED_TESTS+1))
       status_color=$ORANGE
     else
       status_color=$RED
     fi
-    
+
     if [ $debug -ge 1 ]
     then
-      echo -e "Test $id ($NAME) : ${status_color}KO${RESET} - /tmp/test.$$/$id/" 
+      echo -e "Test $id ($NAME) : ${status_color}KO${RESET} - /tmp/test.$$/$id/"
       $MKDIR -p /tmp/test.$$/$id 2>/dev/null
       $CP /tmp/.shell.$$ /tmp/test.$$/$id/mysh.out
       $CP /tmp/.refer.$$ /tmp/test.$$/$id/tcsh.out
@@ -175,7 +174,7 @@ load_test()
       echo -e "${status_color}KO${RESET}"
     fi
   fi
-  
+
   $GREP -v "^$id:" "$HISTORY_FILE" > "/tmp/.history.tmp.$$"
   echo "$id:$current_state" >> "/tmp/.history.tmp.$$"
   $CP "/tmp/.history.tmp.$$" "$HISTORY_FILE"
@@ -189,7 +188,7 @@ print_stats() {
   echo -e "Tests échoués: ${RED}$FAILED_TESTS${RESET}"
   echo -e "Tests améliorés (KO → OK): ${BLUE}$IMPROVED_TESTS${RESET}"
   echo -e "Tests dégradés (OK → KO): ${ORANGE}$REGRESSED_TESTS${RESET}"
-  
+
   if [ $TOTAL_TESTS -gt 0 ]; then
     PASS_PERCENTAGE=$((PASSED_TESTS*100/TOTAL_TESTS))
     echo "Taux de réussite: $PASS_PERCENTAGE%"
