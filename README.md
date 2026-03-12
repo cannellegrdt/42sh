@@ -1,43 +1,278 @@
-##  **Git configuration**
+# 42sh
 
-For this project, we will use a corporate like Git repo with branches, each branches will have it's purpose.
+> Full Unix shell based on TCSH - EPITECH B-PSU-200 Project
 
-* Main: Where the mouli will execute the code, only merge within DO NOT PUSH
-* Test: where we develop test, to merge with dev to check everything before pushing to main
-* [feature]: everyone will dev his own feature and merge it using a pull request
+---
 
-In case of breaking something in main branch, DO NOT PUSH, create branch hotfix and then merge it (because in the hotfix you can commit instead of the man branch)  
-This also apply for the main branch
+## Table of contents
+1. [Overview](#overview)
+2. [Project progression](#project-progression)
+3. [Compilation](#compilation)
+4. [Usage](#usage)
+5. [Features](#features)
+    a) [Builtins](#builtins)
+    b) [Redirections & pipes](#redirections--pipes)
+    c) [Job control](#job-control)
+    d) [Variables](#variables)
+    e) [History](#history)
+    f) [Aliases](#aliases)
+    g) [Globbing](#globbing)
+    h) [Line edition](#line-edition)
+6. [Project architecture](#project-architecture)
 
-If you need help with git : [Git course by me](https://www.canva.com/design/DAGgfwSCgPc/goCja-JEPHb2s3MRiMo2ow/edit?utm_content=DAGgfwSCgPc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)  
-Or just ask me
+---
 
+## Overview
 
-## **Commits**
+**42sh** is a fully-featured Unix shell written in C, modeled after TCSH. It is the culmination of a three-project series:
 
-Do remember to commit and push when you do anything that might goes well to save a backup and reuse it if needed  
+- [B-PSU-200_minishell1.pdf](B-PSU-200_minishell1.pdf) — basic command execution, PATH, and builtins (`cd`, `setenv`, `unsetenv`, `env`, `exit`)
+- [B-PSU-200_minishell2.pdf](B-PSU-200_minishell2.pdf) — semicolons, pipes, and the four redirections (`>`, `<`, `>>`, `<<`)
+- [B-PSU-200_42sh.pdf](B-PSU-200_42sh.pdf) — the full shell: job control, variables, history, aliases, globbing, line edition, scripting, and more
 
-[build] [bld] : modification about the building and dependencies of the project (make)  
-[feat] [add] : adding a new feature  
-[fix] [upd] : correcting or fixing bugs  
-[perf] : upgrading the program performances  
-[refactor] : changing only about NON functional changing or performances (ex : new sorting methods)  
-[style] : modification only about non functional and only ergonomically uses (indentation, space, variable's name)  
-[docs] : update about the documentations  
-[test] : adding or changing tests  
+The reference shell for syntax and compatibility is **tcsh**. Stability is prioritized over quantity of features.
 
+---
 
-## **Project**
+## Project progression
 
-**Steps:**  
+| Project | Features added |
+| --- | --- |
+| **Minishell1** | Command execution via `PATH`, builtins (`cd`, `setenv`, `unsetenv`, `env`, `exit`), proper exit codes |
+| **Minishell2** | Semicolons (`;`), pipes (`\|`), redirections (`>`, `<`, `>>`, `<<`) |
+| **42sh** | Inhibitors (`''`, `""`), globbing (`*`, `?`, `[…]`), job control (`&`, `fg`, `bg`), backticks (`` ` ``), parentheses, local & env variables, special variables, history (`!`), aliases, dynamic line editing, auto-completion, scripting |
 
+---
 
-## **To Do/Done**
+## Compilation
 
+```sh
+# Compile the project
+make
 
-**Bonuses**
+# Clean object files
+make clean
 
+# Remove everything (objects + binary)
+make fclean
 
-## **Trello's link**
+# Recompile from scratch
+make re
+```
 
-[Trello's link](https://trello.com/invite/b/67fe1ea7899db1c0d6b29c40/ATTI3ce14c0039f72dc5986f928d6857dbaa3D07FEAE/42sh)
+---
+
+## Usage
+
+```sh
+./42sh
+```
+
+The shell starts in interactive mode and displays a prompt. Commands are executed after pressing Enter.
+
+```sh
+# You can also pipe commands directly to the shell
+echo "ls -l" | ./42sh
+```
+
+Error messages are written to stderr. The shell exits with the same error code as TCSH would in the same situation.
+
+---
+
+## Features
+
+### Builtins
+
+| Command | Description |
+| --- | --- |
+| `cd [dir]` | Change current directory. Updates `cwd` and triggers `cwdcmd` if set |
+| `setenv VAR val` | Set an environment variable |
+| `unsetenv VAR` | Unset an environment variable |
+| `env` | Display all environment variables |
+| `exit [code]` | Exit the shell with optional exit code |
+| `history` | Display the command history |
+| `alias [name [cmd]]` | Display or define an alias |
+| `fg [%job]` | Bring a background job to the foreground |
+| `which cmd` | Show the full path of a command |
+
+### Redirections & pipes
+
+| Syntax | Description |
+| --- | --- |
+| `cmd > file` | Redirect stdout to file (overwrite) |
+| `cmd >> file` | Redirect stdout to file (append) |
+| `cmd < file` | Redirect stdin from file |
+| `cmd << delim` | Here-document: read stdin until `delim` |
+| `cmd1 \| cmd2` | Pipe stdout of `cmd1` to stdin of `cmd2` |
+| `cmd1 ; cmd2` | Execute `cmd1` then `cmd2` sequentially |
+| `cmd1 && cmd2` | Execute `cmd2` only if `cmd1` succeeds |
+| `cmd1 \|\| cmd2` | Execute `cmd2` only if `cmd1` fails |
+
+### Job control
+
+| Syntax | Description |
+| --- | --- |
+| `cmd &` | Run `cmd` in the background |
+| `fg [%job]` | Bring a background job to the foreground |
+| `bg [%job]` | Resume a stopped job in the background |
+
+### Variables
+
+```sh
+# Local variable
+set myvar = "hello"
+echo $myvar
+
+# Environment variable
+setenv PATH /usr/bin:/bin
+echo $PATH
+```
+
+**Special variables:**
+
+| Variable | Description |
+| --- | --- |
+| `$cwd` | Current working directory |
+| `$term` | Terminal type |
+| `$precmd` | Command executed before each prompt display |
+| `$cwdcmd` | Command executed whenever the directory changes |
+| `$ignoreof` | If set, `CTRL+D` does not exit the shell |
+
+### History
+
+```sh
+# Display history
+history
+
+# Re-execute last command
+!!
+
+# Re-execute command number N
+!N
+
+# Re-execute last command starting with "str"
+!str
+```
+
+### Aliases
+
+```sh
+# Define an alias
+alias ll "ls -l --color"
+
+# Use it
+ll /tmp
+
+# Remove an alias
+unalias ll
+
+# List all aliases
+alias
+```
+
+### Globbing
+
+| Pattern | Description |
+| --- | --- |
+| `*` | Matches any sequence of characters |
+| `?` | Matches any single character |
+| `[abc]` | Matches any character in the set |
+
+```sh
+ls *.c
+ls src/???.c
+ls include/[am]*.h
+```
+
+### Line edition
+
+| Key | Action |
+| --- | --- |
+| `←` / `→` | Move cursor left / right |
+| `↑` / `↓` | Navigate command history |
+| `Tab` | Auto-complete command or filename |
+| `Ctrl+A` | Move to beginning of line |
+| `Ctrl+E` | Move to end of line |
+| `Ctrl+C` | Cancel current line |
+| `Ctrl+D` | Exit shell (unless `$ignoreof` is set) |
+| `bindkey` | Display or remap key bindings |
+
+Multiline editing is supported: if the line is syntactically incomplete (e.g. unclosed quote or pipe at end of line), a continuation prompt is displayed.
+
+---
+
+## Project architecture
+
+```
+.
+├── include/
+│   ├── ast.h           # AST node types and parser interface
+│   ├── commands.h      # Builtin command prototypes
+│   ├── errors.h        # Error codes and messages
+│   ├── list.h          # Linked list interface
+│   ├── mysh.h          # Main shell state structure
+│   ├── pipe.h          # Tokenizer and pipe types
+│   ├── structs.h       # Shared structures
+│   └── utilities.h     # Utility function prototypes
+├── src/
+│   ├── ast/
+│   │   ├── command_parser.c    # Parses individual commands
+│   │   ├── create_ast.c        # Builds the AST from tokens
+│   │   ├── execute_ast.c       # Walks and executes the AST
+│   │   ├── execute_builtins.c  # Dispatches to builtin handlers
+│   │   ├── execute_pipe.c      # Pipeline execution
+│   │   ├── parser_ast.c        # Top-level AST parser
+│   │   ├── pipeline_parser.c   # Pipeline node parsing
+│   │   ├── redirections.c      # Redirection setup
+│   │   └── validate_syntax.c   # Syntax validation pass
+│   ├── commands/
+│   │   ├── env.c               # env builtin
+│   │   ├── executor.c          # External command execution
+│   │   ├── my_alias.c          # alias / unalias builtins
+│   │   ├── my_cd.c             # cd builtin
+│   │   ├── my_exit.c           # exit builtin
+│   │   ├── my_fg.c             # fg builtin
+│   │   ├── my_getenv.c         # Variable lookup helpers
+│   │   ├── my_history.c        # history builtin
+│   │   ├── my_history_bang.c   # History expansion (!)
+│   │   ├── my_setenv.c         # setenv builtin
+│   │   ├── my_unsetenv.c       # unsetenv builtin
+│   │   └── my_which.c          # which builtin
+│   ├── pipe/
+│   │   ├── redirection.c           # Redirection file handling
+│   │   ├── tokenize.c              # Input tokenizer
+│   │   └── tokenize_with_quotes.c  # Quote-aware tokenizer
+│   ├── linked_list/
+│   │   ├── list.c              # Linked list core
+│   │   └── list_array.c        # List-to-array conversion
+│   ├── utilities/
+│   │   ├── char_utilities.c    # Character helpers
+│   │   ├── concat_args.c       # Argument concatenation
+│   │   ├── count_args.c        # Argument counting
+│   │   ├── error_handling.c    # Error display
+│   │   ├── file_path.c         # Path resolution helpers
+│   │   ├── frees.c             # Memory cleanup
+│   │   ├── free_utilities.c    # Additional free helpers
+│   │   ├── is.c                # Character/string predicates
+│   │   ├── prepend.c           # String prepend utility
+│   │   ├── print_help.c        # Help display
+│   │   ├── strisdigit.c        # Digit string check
+│   │   └── wildcards.c         # Glob pattern expansion
+│   ├── bindkey_cmd.c       # bindkey command handler
+│   ├── bindkey_mapping.c   # Key binding map
+│   ├── command_struct.c    # Command structure helpers
+│   ├── config_files.c      # Shell config file loading
+│   ├── job_control.c       # Background/foreground job management
+│   ├── multiline.c         # Multiline input handling
+│   ├── need_multiline.c    # Multiline continuation detection
+│   ├── parenthesis.c       # Parenthesized expression handling
+│   ├── path_handler.c      # PATH resolution
+│   ├── prompt.c            # Prompt display
+│   ├── setup.c             # Shell initialization
+│   └── truth_table.c       # && and || operator handling
+├── main.c
+├── Makefile
+├── B-PSU-200_minishell1.pdf
+├── B-PSU-200_minishell2.pdf
+└── B-PSU-200_42sh.pdf
+```
