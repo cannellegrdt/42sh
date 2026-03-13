@@ -5,11 +5,12 @@
 ---
 
 ## Table of contents
-1. [Overview](#overview)
-2. [Project progression](#project-progression)
-3. [Compilation](#compilation)
-4. [Usage](#usage)
-5. [Features](#features)
+1. [Demo](#demo)
+2. [Overview](#overview)
+3. [Project progression](#project-progression)
+4. [Compilation](#compilation)
+5. [Usage](#usage)
+6. [Features](#features)
     a) [Builtins](#builtins)
     b) [Redirections & pipes](#redirections--pipes)
     c) [Job control](#job-control)
@@ -18,7 +19,13 @@
     f) [Aliases](#aliases)
     g) [Globbing](#globbing)
     h) [Line edition](#line-edition)
-6. [Project architecture](#project-architecture)
+7. [Project architecture](#project-architecture)
+
+---
+
+## Demo
+
+![42sh demo](assets/demo.gif)
 
 ---
 
